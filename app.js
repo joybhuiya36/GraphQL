@@ -4,6 +4,7 @@ const graphqlSchema = require('./graphql/schema');
 const graphqlResolver = require('./graphql/resolvers');
 const cors = require('cors');
 const dotenv = require('dotenv');
+const databaseConnection = require('./config/database');
 const app = express();
 
 const PORT = 8000;
@@ -19,6 +20,7 @@ app.use(
   graphqlHTTP({
     schema: graphqlSchema,
     rootValue: graphqlResolver,
+    graphiql: true,
   }),
 );
 
@@ -33,7 +35,8 @@ app.use((err, req, res, next) => {
 app.use((req, res) => {
   return res.status(400).send({ message: 'Bad Request' });
 });
-
-app.listen(PORT, () => {
-  console.log(`Server is Running on ${PORT} Port!`);
+databaseConnection(() => {
+  app.listen(PORT, () => {
+    console.log(`Server is Running on ${PORT} Port!`);
+  });
 });
